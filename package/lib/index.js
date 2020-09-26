@@ -905,6 +905,77 @@ function mergeRulesStrict (...rules) {
 global.Set.mergeRulesStrict = mergeRulesStrict
 
 /**
+ * Checks every element of a set against a function.
+ * @function
+ * @name Set.prototype.every
+ * @param fn {Function} - The function to check elements against.
+ * @returns {boolean} - True, if all elements in the set pass the check. False, if otherwise.
+ */
+function every (fn) {
+  const self = this
+  let out = true
+  self.forEach(element => out = out && fn(element))
+  return out
+}
+
+global.Set.prototype.every = every
+
+
+/**
+ * Tests if any element of a set passes a check.
+ * @function
+ * @name Set.prototype.some
+ * @param fn {Function} - The function to check elements against.
+ * @returns {boolean} - True, if some element in the set passes the check. False, if otherwise.
+ */
+function some (fn) {
+  const self = this
+  for (let element of self) {
+    if (fn(element)) { return true }
+  }
+  return false
+}
+
+global.Set.prototype.some = some
+
+
+/**
+ * Produces a set with only elements passing a given check.
+ * @function
+ * @name Set.prototype.filter
+ * @param fn {Function} - The function to check elements against.
+ * @returns {Set} - A new set containing only elements which pass the filter.
+ */
+function filter (fn) {
+  const self = this
+  const out = new Set()
+  for (let element of self) {
+    if (fn(element)) { out.add(element) }
+  }
+  return out
+}
+
+global.Set.prototype.filter = filter
+
+
+/**
+ * Find any element in a set which matches a given function.
+ * @function
+ * @name Set.prototype.findAny
+ * @param fn {Function} - The function to check elements against.
+ * @returns {*|undefined} - An element in the set which passes the check or undefined if there are no matching elements.
+ */
+function findAny (fn) {
+  const self = this
+  const out = new Set()
+  for (let element of self) {
+    if (fn(element)) { return element }
+  }
+}
+
+global.Set.prototype.findAny = findAny
+
+/**
  * Flag to indicate the presence of this polyfill
  * @type {boolean}
  * @private

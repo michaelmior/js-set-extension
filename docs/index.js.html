@@ -26,7 +26,7 @@
 
 <nav >
     
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Set.html">Set</a><ul class='methods'><li data-type='method'><a href="Set.html#.cartesian">cartesian</a></li><li data-type='method'><a href="Set.html#.complement">complement</a></li><li data-type='method'><a href="Set.html#.copy">copy</a></li><li data-type='method'><a href="Set.html#.difference">difference</a></li><li data-type='method'><a href="Set.html#.from">from</a></li><li data-type='method'><a href="Set.html#.intersection">intersection</a></li><li data-type='method'><a href="Set.html#.mergeRules">mergeRules</a></li><li data-type='method'><a href="Set.html#.mergeRulesStrict">mergeRulesStrict</a></li><li data-type='method'><a href="Set.html#.power">power</a></li><li data-type='method'><a href="Set.html#.symDiff">symDiff</a></li><li data-type='method'><a href="Set.html#.toSet">toSet</a></li><li data-type='method'><a href="Set.html#.union">union</a></li><li data-type='method'><a href="Set.html#add">add</a></li><li data-type='method'><a href="Set.html#any">any</a></li><li data-type='method'><a href="Set.html#equal">equal</a></li><li data-type='method'><a href="Set.html#has">has</a></li><li data-type='method'><a href="Set.html#intersect">intersect</a></li><li data-type='method'><a href="Set.html#isEmpty">isEmpty</a></li><li data-type='method'><a href="Set.html#isSubsetOf">isSubsetOf</a></li><li data-type='method'><a href="Set.html#isSupersetOf">isSupersetOf</a></li><li data-type='method'><a href="Set.html#properSupersetOf">properSupersetOf</a></li><li data-type='method'><a href="Set.html#properSupersetOf">properSupersetOf</a></li><li data-type='method'><a href="Set.html#randomElement">randomElement</a></li><li data-type='method'><a href="Set.html#rules">rules</a></li><li data-type='method'><a href="Set.html#toArray">toArray</a></li><li data-type='method'><a href="Set.html#union">union</a></li></ul></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Set.html">Set</a><ul class='methods'><li data-type='method'><a href="Set.html#.cartesian">cartesian</a></li><li data-type='method'><a href="Set.html#.complement">complement</a></li><li data-type='method'><a href="Set.html#.copy">copy</a></li><li data-type='method'><a href="Set.html#.difference">difference</a></li><li data-type='method'><a href="Set.html#.from">from</a></li><li data-type='method'><a href="Set.html#.intersection">intersection</a></li><li data-type='method'><a href="Set.html#.mergeRules">mergeRules</a></li><li data-type='method'><a href="Set.html#.mergeRulesStrict">mergeRulesStrict</a></li><li data-type='method'><a href="Set.html#.power">power</a></li><li data-type='method'><a href="Set.html#.symDiff">symDiff</a></li><li data-type='method'><a href="Set.html#.toSet">toSet</a></li><li data-type='method'><a href="Set.html#.union">union</a></li><li data-type='method'><a href="Set.html#add">add</a></li><li data-type='method'><a href="Set.html#any">any</a></li><li data-type='method'><a href="Set.html#equal">equal</a></li><li data-type='method'><a href="Set.html#every">every</a></li><li data-type='method'><a href="Set.html#filter">filter</a></li><li data-type='method'><a href="Set.html#findAny">findAny</a></li><li data-type='method'><a href="Set.html#has">has</a></li><li data-type='method'><a href="Set.html#intersect">intersect</a></li><li data-type='method'><a href="Set.html#isEmpty">isEmpty</a></li><li data-type='method'><a href="Set.html#isSubsetOf">isSubsetOf</a></li><li data-type='method'><a href="Set.html#isSupersetOf">isSupersetOf</a></li><li data-type='method'><a href="Set.html#properSupersetOf">properSupersetOf</a></li><li data-type='method'><a href="Set.html#properSupersetOf">properSupersetOf</a></li><li data-type='method'><a href="Set.html#randomElement">randomElement</a></li><li data-type='method'><a href="Set.html#rules">rules</a></li><li data-type='method'><a href="Set.html#some">some</a></li><li data-type='method'><a href="Set.html#toArray">toArray</a></li><li data-type='method'><a href="Set.html#union">union</a></li></ul></li></ul>
 </nav>
 
 <div id="main">
@@ -685,13 +685,16 @@ function intersectionArbitrary (...args) {
     throw new Error(`The intersection operator currently does not support 0 arguments.`)
   }
   const set3 = new Set()
-  args.forEach(set => {
-    set.forEach(value => {
-      if (args.every(compare => compare.has(value))) {
-        set3.add(value)
-      }
-    })
-  })
+
+  const minimumSet = args.reduce((prev, curr) => {
+    return (prev.size &lt; curr.size) ? prev : curr
+  }, args[0])
+
+  for (let value of minimumSet) {
+    if (args.every(compare => compare.has(value))) {
+      set3.add(value)
+    }
+  }
   return set3
 }
 global.Set.intersection = intersectionArbitrary
@@ -945,6 +948,77 @@ function mergeRulesStrict (...rules) {
 global.Set.mergeRulesStrict = mergeRulesStrict
 
 /**
+ * Checks every element of a set against a function.
+ * @function
+ * @name Set.prototype.every
+ * @param fn {Function} - The function to check elements against.
+ * @returns {boolean} - True, if all elements in the set pass the check. False, if otherwise.
+ */
+function every (fn) {
+  const self = this
+  let out = true
+  self.forEach(element => out = out &amp;&amp; fn(element))
+  return out
+}
+
+global.Set.prototype.every = every
+
+
+/**
+ * Tests if any element of a set passes a check.
+ * @function
+ * @name Set.prototype.some
+ * @param fn {Function} - The function to check elements against.
+ * @returns {boolean} - True, if some element in the set passes the check. False, if otherwise.
+ */
+function some (fn) {
+  const self = this
+  for (let element of self) {
+    if (fn(element)) { return true }
+  }
+  return false
+}
+
+global.Set.prototype.some = some
+
+
+/**
+ * Produces a set with only elements passing a given check.
+ * @function
+ * @name Set.prototype.filter
+ * @param fn {Function} - The function to check elements against.
+ * @returns {Set} - A new set containing only elements which pass the filter.
+ */
+function filter (fn) {
+  const self = this
+  const out = new Set()
+  for (let element of self) {
+    if (fn(element)) { out.add(element) }
+  }
+  return out
+}
+
+global.Set.prototype.filter = filter
+
+
+/**
+ * Find any element in a set which matches a given function.
+ * @function
+ * @name Set.prototype.findAny
+ * @param fn {Function} - The function to check elements against.
+ * @returns {*|undefined} - An element in the set which passes the check or undefined if there are no matching elements.
+ */
+function findAny (fn) {
+  const self = this
+  const out = new Set()
+  for (let element of self) {
+    if (fn(element)) { return element }
+  }
+}
+
+global.Set.prototype.findAny = findAny
+
+/**
  * Flag to indicate the presence of this polyfill
  * @type {boolean}
  * @private
@@ -964,7 +1038,7 @@ global.Set.__isExtended__ = true
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.3</a> on Sat Sep 28 2019 11:48:10 GMT-0400 (Eastern Daylight Time) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.5</a> on Sat Sep 26 2020 08:51:39 GMT-0400 (Eastern Daylight Time) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
 </footer>
 
 <script>prettyPrint();</script>

@@ -558,6 +558,56 @@ describe('Operations (instances)', function () {
       }, /does not match ruleset/)
     })
   })
+
+  describe(Set.prototype.every.name, function () {
+    it('can check all elements', function () {
+      const set = new Set([0, 2, 4])
+      const compare = set.every(element => element % 2 == 0)
+      assert.equal(compare, true);
+    })
+
+    it('fails if one element does not pass', function () {
+      const set = new Set([1, 2, 4])
+      const compare = set.every(element => element % 2 == 0)
+      assert.equal(compare, false);
+    })
+  })
+
+  describe(Set.prototype.some.name, function () {
+    it('can check for a matching element', function () {
+      const set = new Set([1, 2, 3])
+      const compare = set.some(element => element % 2 == 0)
+      assert.equal(compare, true);
+    })
+
+    it('fails if no elements pass', function () {
+      const set = new Set([1, 3, 5])
+      const compare = set.some(element => element % 2 == 0)
+      assert.equal(compare, false);
+    })
+  })
+
+  describe(Set.prototype.filter.name, function () {
+    it('can filter matching elements', function () {
+      const set = new Set([1, 2, 3])
+      const compare = set.filter(element => element % 2 != 0)
+      assert.deepEqual(compare, new Set([1, 3]));
+    })
+  })
+
+  describe(Set.prototype.findAny.name, function () {
+    it('can find a matching element', function () {
+      const set = new Set([1, 2, 3])
+      const compare = set.findAny(element => element > 2)
+      assert.equal(compare, 3);
+    })
+
+    it('returns undefined if no element is found', function () {
+      const set = new Set([1, 2, 3])
+      const compare = set.findAny(element => element > 3)
+      assert.equal(compare, undefined);
+    })
+  })
 })
 
 describe('Operations (static)', function () {

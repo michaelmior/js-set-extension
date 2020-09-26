@@ -27,6 +27,10 @@ Extended version of <a href="https://developer.mozilla.org/en-US/docs/Web/JavaSc
         * [.isEmpty()](#Set+isEmpty) ⇒ <code>boolean</code>
         * [.union(args)](#Set+union) ⇒ [<code>Set</code>](#Set)
         * [.intersect(args)](#Set+intersect) ⇒ [<code>Set</code>](#Set)
+        * [.every(fn)](#Set+every) ⇒ <code>boolean</code>
+        * [.some(fn)](#Set+some) ⇒ <code>boolean</code>
+        * [.filter(fn)](#Set+filter) ⇒ [<code>Set</code>](#Set)
+        * [.findAny(fn)](#Set+findAny) ⇒ <code>\*</code> \| <code>undefined</code>
     * _static_
         * [.from(...args)](#Set.from) ⇒ [<code>Set</code>](#Set)
         * [.toSet(value)](#Set.toSet) ⇒ [<code>Set</code>](#Set)
@@ -373,6 +377,54 @@ const A = Set.from(0, 1, 2, 4)
 const B = Set.from(1, 2, 9)
 A.intersect(B) // Set { 1, 2 }
 ```
+<a name="Set+every"></a>
+
+### set.every(fn) ⇒ <code>boolean</code>
+Checks every element of a set against a function.
+
+**Kind**: instance method of [<code>Set</code>](#Set)  
+**Returns**: <code>boolean</code> - - True, if all elements in the set pass the check. False, if otherwise.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| fn | <code>function</code> | The function to check elements against. |
+
+<a name="Set+some"></a>
+
+### set.some(fn) ⇒ <code>boolean</code>
+Tests if any element of a set passes a check.
+
+**Kind**: instance method of [<code>Set</code>](#Set)  
+**Returns**: <code>boolean</code> - - True, if some element in the set passes the check. False, if otherwise.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| fn | <code>function</code> | The function to check elements against. |
+
+<a name="Set+filter"></a>
+
+### set.filter(fn) ⇒ [<code>Set</code>](#Set)
+Produces a set with only elements passing a given check.
+
+**Kind**: instance method of [<code>Set</code>](#Set)  
+**Returns**: [<code>Set</code>](#Set) - - A new set containing only elements which pass the filter.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| fn | <code>function</code> | The function to check elements against. |
+
+<a name="Set+findAny"></a>
+
+### set.findAny(fn) ⇒ <code>\*</code> \| <code>undefined</code>
+Find any element in a set which matches a given function.
+
+**Kind**: instance method of [<code>Set</code>](#Set)  
+**Returns**: <code>\*</code> \| <code>undefined</code> - - An element in the set which passes the check or undefined if there are no matching elements.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| fn | <code>function</code> | The function to check elements against. |
+
 <a name="Set.from"></a>
 
 ### Set.from(...args) ⇒ [<code>Set</code>](#Set)

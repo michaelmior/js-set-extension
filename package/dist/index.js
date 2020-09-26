@@ -1,6 +1,12 @@
 "use strict";
 
-function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+function _createForOfIteratorHelper(o, allowArrayLike) { var it; if (typeof Symbol === "undefined" || o[Symbol.iterator] == null) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = o[Symbol.iterator](); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 // //////////////////////////////////////////////////////////////////////////////// //
 // MIT License
@@ -147,10 +153,10 @@ function resolve(obj) {
 
   if (typeof obj === 'function') {
     var fctObj = {
-      fctStr: String(obj).replace(/\s+/g, '') // function body to string
-      // resolve all function properties / attached references
+      fctStr: String(obj).replace(/\s+/g, '')
+    }; // function body to string
+    // resolve all function properties / attached references
 
-    };
     fctObj.refs = Object.getOwnPropertyNames(obj).map(function (key) {
       return originalHas.call(circ, obj[key]) ? 'circular' : resolve(obj[key], circ);
     });
@@ -320,7 +326,7 @@ function toArray() {
 
 global.Set.prototype.toArray = toArray;
 /**
- * Returns an arbitrary element of this collection.
+ * Returns an arbitrary element of this set.
  * Basically the first element, retrieved by iterator.next().value will be used.
  * @function
  * @name Set.prototype.any
@@ -334,6 +340,21 @@ function any() {
 }
 
 global.Set.prototype.any = any;
+/**
+ * Returns a random element of this set.
+ * One element of this set is chosen at random and returned.  The probability distribution is uniform.  Math.random() is used internally for this purpose.
+ * @function
+ * @name Set.prototype.randomElement
+ * @returns {*} An element chosen randomly from the current set that could be of any type, depending on the elements of the set.
+ */
+
+function randomElementUnary() {
+  var array = this.toArray();
+  var randomIndex = Math.floor(Math.random() * array.length);
+  return array[randomIndex];
+}
+
+global.Set.prototype.randomElement = randomElementUnary;
 /**
  * Checks, whether the current set (this) is a superset of the given set.
  * A set A is superset of set B, if A contains all elements of B.
@@ -552,7 +573,7 @@ function from() {
     args[_key2] = arguments[_key2];
   }
 
-  return new Set(args.concat());
+  return new Set([].concat(args));
 }
 
 global.Set.from = from;
@@ -680,15 +701,33 @@ function intersectionArbitrary() {
   }
 
   var set3 = new Set();
-  args.forEach(function (set) {
-    set.forEach(function (value) {
+  var minimumSet = args.reduce(function (prev, curr) {
+    return prev.size < curr.size ? prev : curr;
+  }, args[0]);
+
+  var _iterator = _createForOfIteratorHelper(minimumSet),
+      _step;
+
+  try {
+    var _loop = function _loop() {
+      var value = _step.value;
+
       if (args.every(function (compare) {
         return compare.has(value);
       })) {
         set3.add(value);
       }
-    });
-  });
+    };
+
+    for (_iterator.s(); !(_step = _iterator.n()).done;) {
+      _loop();
+    }
+  } catch (err) {
+    _iterator.e(err);
+  } finally {
+    _iterator.f();
+  }
+
   return set3;
 }
 
@@ -979,6 +1018,120 @@ function mergeRulesStrict() {
 }
 
 global.Set.mergeRulesStrict = mergeRulesStrict;
+/**
+ * Checks every element of a set against a function.
+ * @function
+ * @name Set.prototype.every
+ * @param fn {Function} - The function to check elements against.
+ * @returns {boolean} - True, if all elements in the set pass the check. False, if otherwise.
+ */
+
+function every(fn) {
+  var self = this;
+  var out = true;
+  self.forEach(function (element) {
+    return out = out && fn(element);
+  });
+  return out;
+}
+
+global.Set.prototype.every = every;
+/**
+ * Tests if any element of a set passes a check.
+ * @function
+ * @name Set.prototype.some
+ * @param fn {Function} - The function to check elements against.
+ * @returns {boolean} - True, if some element in the set passes the check. False, if otherwise.
+ */
+
+function some(fn) {
+  var self = this;
+
+  var _iterator2 = _createForOfIteratorHelper(self),
+      _step2;
+
+  try {
+    for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
+      var element = _step2.value;
+
+      if (fn(element)) {
+        return true;
+      }
+    }
+  } catch (err) {
+    _iterator2.e(err);
+  } finally {
+    _iterator2.f();
+  }
+
+  return false;
+}
+
+global.Set.prototype.some = some;
+/**
+ * Produces a set with only elements passing a given check.
+ * @function
+ * @name Set.prototype.filter
+ * @param fn {Function} - The function to check elements against.
+ * @returns {Set} - A new set containing only elements which pass the filter.
+ */
+
+function filter(fn) {
+  var self = this;
+  var out = new Set();
+
+  var _iterator3 = _createForOfIteratorHelper(self),
+      _step3;
+
+  try {
+    for (_iterator3.s(); !(_step3 = _iterator3.n()).done;) {
+      var element = _step3.value;
+
+      if (fn(element)) {
+        out.add(element);
+      }
+    }
+  } catch (err) {
+    _iterator3.e(err);
+  } finally {
+    _iterator3.f();
+  }
+
+  return out;
+}
+
+global.Set.prototype.filter = filter;
+/**
+ * Find any element in a set which matches a given function.
+ * @function
+ * @name Set.prototype.findAny
+ * @param fn {Function} - The function to check elements against.
+ * @returns {*|undefined} - An element in the set which passes the check or undefined if there are no matching elements.
+ */
+
+function findAny(fn) {
+  var self = this;
+  var out = new Set();
+
+  var _iterator4 = _createForOfIteratorHelper(self),
+      _step4;
+
+  try {
+    for (_iterator4.s(); !(_step4 = _iterator4.n()).done;) {
+      var element = _step4.value;
+
+      if (fn(element)) {
+        return element;
+      }
+    }
+  } catch (err) {
+    _iterator4.e(err);
+  } finally {
+    _iterator4.f();
+  }
+}
+
+global.Set.prototype.findAny = findAny;
 /**
  * Flag to indicate the presence of this polyfill
  * @type {boolean}
